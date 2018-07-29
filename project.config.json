@@ -1,0 +1,15 @@
+{
+	"description": "A WePY project",
+	"setting": {
+		"urlCheck": true,
+		"es6": false,
+		"postcss": false,
+		"minified": false,
+		"newFeature": true
+	},
+	"compileType": "miniprogram",
+	"appid": "wx3afcd92f1f2cc239",
+	"projectname": "music",
+	"miniprogramRoot": "./dist",
+	"condition": {}
+}
