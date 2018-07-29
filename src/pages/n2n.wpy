@@ -1,0 +1,17 @@
+<style lang="less">
+
+</style>
+
+<template>
+  <view>123456789</view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class N2n extends wepy.page {
+    config = {
+      navigationBarTitleText: 'Number to notation'
+    }
+  }
+</script>

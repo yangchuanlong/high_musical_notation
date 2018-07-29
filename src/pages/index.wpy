@@ -22,6 +22,7 @@
       <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
     </view>
 
+    <button @tap="gotoNN()"> go to n2n </button>
     <panel>
       <view class="title" slot="title">测试数据绑定</view>
 
@@ -182,6 +183,11 @@
     }
 
     methods = {
+      gotoNN() {
+        this.$navigate({
+          url: 'n2n'
+        })
+      },
       plus () {
         this.mynum++
       },
