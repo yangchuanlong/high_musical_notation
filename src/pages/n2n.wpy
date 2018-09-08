@@ -1,17 +1,112 @@
 <style lang="less">
-
+page{
+  height:100%;
+}
+.animWrapper{
+  position: relative;
+  width:100%;
+  height:calc(~"100% - 50px")
+}
+.number{
+  display:inline-block;
+  position: absolute;
+  background-color:white;
+}
+.notation,.number{
+  border:1px solid teal;
+  width:30px;
+  text-align:center;
+  height:30px;
+  line-height: 30px;
+  border-radius:50%;
+}
+.notationWrapper{
+  display:flex;
+  position:fixed;
+  width:100%;
+  bottom:0;
+  height:50px;
+  justify-content: space-around;
+}
 </style>
 
 <template>
-  <view>123456789</view>
+  <view class="animWrapper">
+    <block wx:for-items="{{numbers}}" wx:for-item="item" wx:key="index">
+      <view class="number" style="left:{{item.left}}%;bottom:{{item.bottom}}%">{{item.number}}</view>
+    </block>
+  </view>
+
+  <view class="notationWrapper" @tap="notationClick">
+    <view class="notation" id="1">do</view>
+    <view class="notation" id="2">re</view>
+    <view class="notation" id="3">mi</view>
+    <view class="notation" id="4">fa</view>
+    <view class="notation" id="5">so</view>
+    <view class="notation" id="6">la</view>
+    <view class="notation" id="7">xi</view>
+  </view>
 </template>
 
 <script>
   import wepy from 'wepy'
 
-  export default class N2n extends wepy.page {
+  let numbers = []
+
+export default class N2n extends wepy.page { // number to notation
     config = {
       navigationBarTitleText: 'Number to notation'
+    };
+    data = {
+      numbers: []
+    };
+    methods = {
+      notationClick: function(evt) {
+        const targetNumber = evt.target.id * 1
+        numbers = numbers.filter(item => item.number !== targetNumber)
+        this.setData({numbers})
+      }
+    };
+    getRandomItem(n) {
+      let number = n || Math.ceil(Math.random() * 7)
+      let left = Math.random() * 95
+      let bottom = 100
+      return {number, left, bottom}
+    }
+    goForward() {
+      numbers.forEach(function(item) {
+        item.bottom -= 0.2
+      })
+    }
+    onShow() {
+      const _t = this
+      const goForward = function() {
+        _t.goForward()
+        _t.data.numbers = numbers
+        _t.setData(_t.data)
+        _t.forwardAnim = setTimeout(function() {
+          goForward()
+        }, 17)
+      }
+      goForward()
+    }
+    onUnload() {
+      if (this.forwardAnim) {
+        clearTimeout(this.forwardAnim)
+        this.forwardAnim = null
+      }
+      if (this.addInterval) {
+        clearInterval(this.addInterval)
+        this.addInterval = null
+      }
+    }
+    onLoad() {
+      let _t = this
+      let winInfo = wx.getSystemInfoSync()
+      this.size = {w: winInfo.windowWidth, h: winInfo.windowHeight}
+      this.addInterval = setInterval(function() {
+        numbers.push(_t.getRandomItem())
+      }, 1000)
     }
   }
 </script>
