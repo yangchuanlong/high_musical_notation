@@ -28,6 +28,18 @@ page{
   height:50px;
   justify-content: space-around;
 }
+.score{
+  position:absolute;
+  width:100px;
+  height:30px;
+  top:0;
+  right:0;
+  text-align:right;
+  padding-right:6px;
+  background:white;
+  display:inline;
+
+}
 </style>
 
 <template>
@@ -46,25 +58,34 @@ page{
     <view class="notation" id="6">la</view>
     <view class="notation" id="7">xi</view>
   </view>
+
+  <view class="score">{{score}}</view>
 </template>
 
 <script>
   import wepy from 'wepy'
 
   let numbers = []
+  let score = 0
 
 export default class N2n extends wepy.page { // number to notation
     config = {
       navigationBarTitleText: 'Number to notation'
     };
     data = {
-      numbers: []
+      numbers,
+      score
     };
     methods = {
       notationClick: function(evt) {
         const targetNumber = evt.target.id * 1
+        const itemNumber = numbers.length
         numbers = numbers.filter(item => item.number !== targetNumber)
-        this.setData({numbers})
+        const newScore = itemNumber - numbers.length
+        score += newScore
+        this.score = score
+        console.log(this.numbers)
+        this.setData(this.data)
       }
     };
     getRandomItem(n) {
@@ -78,19 +99,7 @@ export default class N2n extends wepy.page { // number to notation
         item.bottom -= 0.2
       })
     }
-    onShow() {
-      const _t = this
-      const goForward = function() {
-        _t.goForward()
-        _t.data.numbers = numbers
-        _t.setData(_t.data)
-        _t.forwardAnim = setTimeout(function() {
-          goForward()
-        }, 17)
-      }
-      goForward()
-    }
-    onUnload() {
+    stopGame() {
       if (this.forwardAnim) {
         clearTimeout(this.forwardAnim)
         this.forwardAnim = null
@@ -100,13 +109,33 @@ export default class N2n extends wepy.page { // number to notation
         this.addInterval = null
       }
     }
-    onLoad() {
-      let _t = this
-      let winInfo = wx.getSystemInfoSync()
-      this.size = {w: winInfo.windowWidth, h: winInfo.windowHeight}
+    onShow() {
+      const _t = this
+      this.setData({numbers, score})
+      this.numbers = numbers
+      this.score = score
       this.addInterval = setInterval(function() {
         numbers.push(_t.getRandomItem())
       }, 1000)
+      const goForward = function() {
+        _t.goForward()
+        _t.setData({numbers, score})
+        if (!numbers.some(item => item.bottom <= 0)) {
+          _t.forwardAnim = setTimeout(function() {
+            goForward()
+          }, 17)
+        } else {
+          clearInterval(_t.addInterval)
+        }
+      }
+      goForward()
+    }
+    onUnload() {
+      this.stopGame()
+    }
+    onLoad() {
+      let winInfo = wx.getSystemInfoSync()
+      this.size = {w: winInfo.windowWidth, h: winInfo.windowHeight}
     }
   }
 </script>
