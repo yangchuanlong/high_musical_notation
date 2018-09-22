@@ -88,45 +88,46 @@ page, .outerWrapper{
 <script>
   import wepy from 'wepy'
 
-  let numbers = []
-  let score = 0
-  let isGameOver = false
-
 export default class N2n extends wepy.page { // number to notation
     config = {
       navigationBarTitleText: 'Number to notation'
     };
     data = {
-      numbers,
-      score,
-      isGameOver
+      numbers: [],
+      score: 0,
+      isGameOver: false
     };
     methods = {
       notationClick: function(evt) {
+        let n1 = this.numbers.length
+        let score = this.score
         const targetNumber = evt.target.id * 1
-        const itemNumber = numbers.length
-        numbers = numbers.filter(item => item.number !== targetNumber)
-        const newScore = itemNumber - numbers.length
-        score += newScore
-        this.setData({score, numbers})
+        this.numbers = this.numbers.filter(item => item.number !== targetNumber)
+        const n2 = this.numbers.length
+        score += n1 - n2
+        this.score = score
       },
       playOneMore: function() {
-        numbers = []
-        score = 0
-        isGameOver = false
+        this.numbers = []
+        this.score = 0
+        this.isGameOver = false
         this.resumeGame()
       }
     };
-    getRandomItem(n) {
+    addRandomItem(n) {
       let number = n || Math.ceil(Math.random() * 7)
       let left = Math.random() * 95
       let bottom = 100
-      return {number, left, bottom}
+      let numbers = this.numbers
+      numbers.push({number, left, bottom})
+      this.setData({numbers})
     }
     goForward() {
-      numbers.forEach(function(item) {
-        item.bottom -= 0.2
+      this.numbers = this.numbers.map(function(item) {
+        item.bottom -= 0.5
+        return item
       })
+      this.setData({numbers: this.numbers})
     }
     stopGame() {
       if (this.forwardAnim) {
@@ -141,30 +142,30 @@ export default class N2n extends wepy.page { // number to notation
 
     resumeGame() {
       const _t = this
-      this.setData({numbers, score, isGameOver})
       this.addInterval = setInterval(function() {
-        numbers.push(_t.getRandomItem())
+        _t.addRandomItem()
       }, 1000)
       const goForward = function() {
         _t.goForward()
-        _t.setData({numbers, score, isGameOver})
         if (!_t.checkGameOver()) {
           _t.forwardAnim = setTimeout(function() {
             goForward()
-          }, 17)
+          }, 60)
         } else {
           clearInterval(_t.addInterval)
         }
       }
       goForward()
     }
-
+    onHide() {
+      this.stopGame()
+    }
     onShow() {
-      this.setData({numbers, score, isGameOver})
       this.resumeGame()
     }
     checkGameOver() {
-      const isGameOver = numbers.length && numbers.some(item => item.bottom <= 0)
+      const isGameOver = this.numbers.length && this.numbers.some(item => item.bottom <= 0)
+      this.isGameOver = isGameOver
       this.setData({isGameOver})
       return isGameOver
     }
