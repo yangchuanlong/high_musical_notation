@@ -30,15 +30,13 @@ page{
 }
 .score{
   position:absolute;
-  width:100px;
   height:30px;
   top:0;
   right:0;
   text-align:right;
   padding-right:6px;
   background:white;
-  display:inline;
-
+  text-decoration:underline;
 }
 </style>
 
@@ -59,7 +57,7 @@ page{
     <view class="notation" id="7">xi</view>
   </view>
 
-  <view class="score">{{score}}</view>
+  <text class="score">{{score}}</text>
 </template>
 
 <script>
@@ -84,8 +82,7 @@ export default class N2n extends wepy.page { // number to notation
         const newScore = itemNumber - numbers.length
         score += newScore
         this.score = score
-        console.log(this.numbers)
-        this.setData(this.data)
+        this.numbers = numbers
       }
     };
     getRandomItem(n) {
@@ -111,7 +108,6 @@ export default class N2n extends wepy.page { // number to notation
     }
     onShow() {
       const _t = this
-      this.setData({numbers, score})
       this.numbers = numbers
       this.score = score
       this.addInterval = setInterval(function() {
